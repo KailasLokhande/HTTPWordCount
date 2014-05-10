@@ -1,0 +1,24 @@
+Application is to get count of word from server files.
+
+Procedure to setup this application:
+1. Deploy the war available on Server
+2. After deployment of this war , your tomcat webapps will create folder with application name.
+3. Go to this folder.
+4. Find config folder
+5. Inside config folder you will find "http-word-app.properties" file. This is central configuration file for this application.
+6. Provide list of absolute paths for files that you want to load and make searchable.
+7. Once done, save this file.
+
+How to Use:
+
+1. Goto http://<host>:<port>/HTTPWordCount/
+2. Browser will give some output. This should be an error, because you are suppose to provide query parameters like ../?query=<word to serach>
+3. Update url like httpL//<host>:<port>/?query=word
+4. This will return output in json.
+For Example: 
+URL : ..../?query=kailas
+Output: {"count":1, "query":"kailas"}
+5. Additionally you can choose to do search by ignoring case. For this add one more queryparameter called "ignoreCase"
+For Example:
+URL : ..../?query=kailas&ignoreCase=true
+Output: {"count":2, "query":"kailas", "ignoreCase":true}

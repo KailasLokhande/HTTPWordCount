@@ -1,0 +1,44 @@
+Requirements:
+1. Read files from server
+2. Proved API to users for getting word count.
+
+Design:
+1. Lets solve first requirement. Reading files from server. 
+Here we have 4 options, 
+i. Provide 1 file at a time. 
+	Cons: Not scalable.
+ii. Provide 1 directory at a time
+	Cons: Application will read only from 1 directory. If there are other files which you want server to read, you have to copy them to the directory.
+iii. Provide list of files 
+	Pros: Can provide more than 1 file present at any location.
+		  No need to copy files from one place to another.
+    Cons: Need to specify all files even though they are in same directory.
+iv. Provide list of file and directories. 
+    Pros: All pros of 3 + takes care of cons of 3.
+
+We have followed option 3 in this solution. Solution is like, on server one config file is present under this application directory called "http-word-app.properties"
+You can specify list of files (absolute paths of files) against property called "file-paths".
+
+Each file will be parsed and words in that file will be stored in one memory data structure (MAP). 
+
+** If file is modified at backed, application will reload this data structure. No need to restart.
+*** Note: Option 4 just strike my mind while writing this document. We can implement it easily with current solution. Current solution is following option 3.
+
+2. Second requirement , expose HTTP api to user to get word count.
+
+Here application is  using Jersey framework to expose REST apis. 
+Currently there is only one API exposed to search and get count of word.
+
+
+Overall design looks as below:
+
+
+
+------------------------
+|	REST LAYER         | ==> Exposing data to end user
+------------------------
+|  BUSINESS LAYER      |  ==> reading files , creating indexing
+------------------------
+	
+
+Please go through readme file to understand how to use this app.
