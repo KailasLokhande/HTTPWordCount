@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Scanner;
@@ -30,18 +31,17 @@ public class WordDataProvider {
 	 * InMemory data structure to store words with their count. For case
 	 * sensitive searches this data structure will be used.
 	 **/
-	private static Map<String, Integer> wordCount = new HashMap<String, Integer>();
+	private static Hashtable<String, Integer> wordCount = new Hashtable<String, Integer>();
 	/**
 	 * This is another InMemory data structure to store word and their counts.
-	 * But this will be used in case of case insensitive searches. 
-	 * NOTE: Yes, I
+	 * But this will be used in case of case insensitive searches. NOTE: Yes, I
 	 * agree, this increase space complexity. But it improves time complexity
 	 * for case insensitive search. Another option for this was to iterate over
 	 * all keys and compare with query word. This will surely take O(n)
 	 * complexity. Whereas with this extra space complexity, we are getting O(1)
 	 * search.
 	 */
-	private static Map<String, Integer> wordCountIgnoreCase = new HashMap<String, Integer>();
+	private static Hashtable<String, Integer> wordCountIgnoreCase = new Hashtable<String, Integer>();
 
 	/**
 	 * Here we are enabling addition and removal of files from config and
@@ -84,11 +84,10 @@ public class WordDataProvider {
 			}
 
 			// Reinitialize inmemory.
-			wordCount = new HashMap<String, Integer>();
-			wordCountIgnoreCase = new HashMap<String, Integer>();
+			wordCount.clear();
+			wordCountIgnoreCase.clear();
 			String[] filePathList = filePaths.split(",");
 			for (String filePath : filePathList) {
-
 				File file = new File(filePath);
 				updateWordCount(file);
 			}
@@ -105,21 +104,24 @@ public class WordDataProvider {
 	private static void updateWordCount(File file) throws FileNotFoundException {
 		Scanner scanner = new Scanner(file);
 		while (scanner.hasNext()) {
-			String next = scanner.next().trim();
-			// Case sensitive data store update
-			int count = 1;
-			if (wordCount.containsKey(next)) {
-				count += wordCount.get(next);
-			}
-			wordCount.put(next, count);
+			String nextScannerToken = scanner.next().trim();
+			String[] tokens = nextScannerToken.split(",");
+			for (String next : tokens) {
+				// Case sensitive data store update
+				int count = 1;
+				if (wordCount.containsKey(next)) {
+					count += wordCount.get(next);
+				}
+				wordCount.put(next, count);
 
-			// Case insensitive data store update
-			// all keys will be stored in lowercase.
-			count = 1;
-			if (wordCountIgnoreCase.containsKey(next)) {
-				count += wordCountIgnoreCase.get(next);
+				// Case insensitive data store update
+				// all keys will be stored in lowercase.
+				count = 1;
+				if (wordCountIgnoreCase.containsKey(next)) {
+					count += wordCountIgnoreCase.get(next);
+				}
+				wordCountIgnoreCase.put(next.toLowerCase(), count);
 			}
-			wordCountIgnoreCase.put(next.toLowerCase(), count);
 		}
 		scanner.close();
 	}
@@ -132,8 +134,8 @@ public class WordDataProvider {
 	 * @throws IOException
 	 * @throws URISyntaxException
 	 */
-	public Map getAllWordCounts()
-			throws FileNotFoundException, IOException, URISyntaxException {
+	public Map getAllWordCounts() throws FileNotFoundException, IOException,
+			URISyntaxException {
 		return getAllWordCounts(false);
 	}
 
@@ -174,6 +176,7 @@ public class WordDataProvider {
 
 	/**
 	 * Returns word count, CASE SENSITIVITY depends on boolean value.
+	 * 
 	 * @param word
 	 * @param ignoreCase
 	 * @return word count
@@ -184,7 +187,6 @@ public class WordDataProvider {
 	public int getWordCount(String word, boolean ignoreCase)
 			throws FileNotFoundException, IOException, URISyntaxException {
 		readFiles();
-
 		if (word == null || word.trim().length() == 0) {
 			throw new IllegalArgumentException(
 					"Please provide proper query word. Word should not be null or empty. For example: <host>:<port>/<path>/?query=<word>&ignoreCase=<true/false>");
